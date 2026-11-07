@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ear Trainer — Интервалы</title>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <h1>🎧 Ear Trainer</h1>
+        <div class="stats">
+          <span class="stat"><b id="statCorrect">0</b> верно</span>
+          <span class="stat"><b id="statTotal">0</b> всего</span>
+          <span class="stat"><b id="statStreak">0</b> серия</span>
+        </div>
+      </header>
+
+      <main class="practice">
+        <div class="practice-head">
+          <button id="playBtn" class="play-btn" aria-label="Слушать">
+            <span class="label">Слушать</span>
+          </button>
+          <div class="feedback" id="feedback"></div>
+        </div>
+
+        <section class="answers" id="answers"></section>
+
+        <button class="next-btn" id="nextBtn" hidden>Дальше →</button>
+      </main>
+
+      <div class="piano" id="piano" hidden></div>
+    </div>
+
+    <section class="settings-panel">
+      <button
+        class="settings-toggle"
+        id="settingsToggle"
+        aria-expanded="false"
+        aria-controls="settingsBody"
+      >
+        <span>⚙ Настройки</span>
+        <span class="chevron" aria-hidden="true">⌄</span>
+      </button>
+
+      <div class="settings-body" id="settingsBody" hidden>
+        <div class="controls-row">
+          <div class="control-group">
+            <label>Режим</label>
+            <div class="segmented" id="modeSwitch">
+              <button data-mode="melodic" class="active">Мелодический</button>
+              <button data-mode="harmonic">Гармонический</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Направление</label>
+            <div class="segmented" id="directionSwitch">
+              <button data-dir="up" class="active" title="Вверх">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" aria-hidden="true">
+                  <line x1="12" y1="19" x2="12" y2="5" />
+                  <polyline points="5 12 12 5 19 12" />
+                </svg>
+              </button>
+              <button data-dir="down" title="Вниз">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" aria-hidden="true">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <polyline points="19 12 12 19 5 12" />
+                </svg>
+              </button>
+              <button data-dir="mix" title="Микс">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" aria-hidden="true">
+                  <line x1="8" y1="19" x2="8" y2="5" />
+                  <polyline points="4 9 8 5 12 9" />
+                  <line x1="16" y1="5" x2="16" y2="19" />
+                  <polyline points="12 15 16 19 20 15" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Сложность</label>
+            <div class="segmented" id="difficultySwitch">
+              <button data-diff="easy">1</button>
+              <button data-diff="medium" class="active">2</button>
+              <button data-diff="hard">3</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label>Интервалы</label>
+          <div class="chips groups" id="groupChips"></div>
+        </div>
+
+        <label class="setting">
+          <input type="checkbox" id="showPiano" />
+          <span>Показывать клавиатуру</span>
+        </label>
+      </div>
+    </section>
+
+    <button
+      class="sidebar-handle"
+      id="sidebarHandle"
+      aria-label="Показать настройки"
+      aria-expanded="true"
+      aria-controls="settingsBody"
+    ></button>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
