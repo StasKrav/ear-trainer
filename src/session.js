@@ -2,6 +2,8 @@ import { AudioEngine } from './audio.js';
 import { RANGES, ADVANCE_DELAY } from './constants.js';
 import * as AnswersUI from './ui/answers.js';
 import { highlightKeys, clearHighlights } from './ui/piano.js';
+import { showToast, clearToast } from './ui/toast.js';
+
 
 export function createSession({ exercise, mode, direction, difficulty }) {
   const state = {
@@ -18,7 +20,6 @@ export function createSession({ exercise, mode, direction, difficulty }) {
     advanceTimer: null,
   };
 
-  const feedbackEl = document.getElementById('feedback');
   const playBtn = document.getElementById('playBtn');
 
   function cancelAdvance() {
@@ -37,52 +38,52 @@ export function createSession({ exercise, mode, direction, difficulty }) {
   }
 
   function newQuestion() {
-    cancelAdvance();
-    state.answered = false;
-    feedbackEl.textContent = '';
-    feedbackEl.className = 'feedback';
-    clearHighlights();
-    AnswersUI.resetAnswerButtons();
+  cancelAdvance();
+  state.answered = false;
+  clearToast();
+  clearHighlights();
+  AnswersUI.resetAnswerButtons();
 
-    state.current = state.exercise.generate();
-    playBtn.disabled = false;
-    playBtn.focus();
+  state.current = state.exercise.generate();
+  playBtn.disabled = false;
+  playBtn.focus();
 
-    if (AudioEngine.ready()) {
-      setTimeout(() => {
-        AudioEngine.resume();
-        state.exercise.play(state.current);
-      }, 150);
-    }
+  if (AudioEngine.ready()) {
+    setTimeout(() => {
+      AudioEngine.resume();
+      state.exercise.play(state.current);
+    }, 150);
+  }
+}
+
+function answer(id, btn) {
+  if (state.answered) return;
+  state.answered = true;
+  state.total++;
+
+  const correct = id === state.current.answer;
+  AnswersUI.disableAnswers();
+
+  if (correct) {
+    AnswersUI.markCorrect(id);
+    state.correct++;
+    state.streak++;
+    showToast({ correct: true });
+  } else {
+    AnswersUI.markWrong(id);
+    AnswersUI.markCorrect(state.current.answer);
+    state.streak = 0;
+    const name = state.exercise
+      .pool()
+      .find((i) => i.id === state.current.answer)?.name;
+    showToast({ correct: false, answerName: name });
   }
 
-  function answer(id, btn) {
-    if (state.answered) return;
-    state.answered = true;
-    state.total++;
+  updateStats();
+  highlightKeys(state.current.notes);
+  scheduleAdvance();
+}
 
-    const correct = id === state.current.answer;
-    AnswersUI.disableAnswers();
-
-    if (correct) {
-      AnswersUI.markCorrect(id);
-      state.correct++;
-      state.streak++;
-      feedbackEl.textContent = '✅ Верно!';
-      feedbackEl.className = 'feedback ok';
-    } else {
-      AnswersUI.markWrong(id);
-      AnswersUI.markCorrect(state.current.answer);
-      state.streak = 0;
-      const name = state.exercise.pool().find((i) => i.id === state.current.answer)?.name;
-      feedbackEl.textContent = `❌ Это ${name}`;
-      feedbackEl.className = 'feedback err';
-    }
-
-    updateStats();
-    highlightKeys(state.current.notes);
-    scheduleAdvance();
-  }
 
   function updateStats() {
     document.getElementById('statCorrect').textContent = state.correct;
