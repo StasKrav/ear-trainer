@@ -46,7 +46,7 @@ export const AudioEngine = (() => {
     return 440 * Math.pow(2, (midi - 69) / 12);
   }
 
-  function playNote(midi, when, dur, gain = 2.0) {
+  function playNote(midi, when, dur, gain = 4.0) {
     if (!piano) return;
     piano.play(midi, when, { duration: dur, gain });
   }

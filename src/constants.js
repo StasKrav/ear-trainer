@@ -5,3 +5,4 @@ export const RANGES = {
 };
 
 export const ADVANCE_DELAY = 1500;
+export const ROUND_SIZE = 10;

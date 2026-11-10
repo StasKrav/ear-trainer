@@ -12,7 +12,7 @@
         <div class="stats">
           <span class="stat"><b id="statCorrect">0</b> верно</span>
           <span class="stat"><b id="statTotal">0</b> всего</span>
-          <span class="stat"><b id="statStreak">0</b> серия</span>
+          <span class="stat"><b id="statAccuracy">—</b> точность</span>
         </div>
       </header>
 
@@ -21,8 +21,10 @@
           <button id="playBtn" class="play-btn" aria-label="Слушать">
             <span class="label">Слушать</span>
           </button>
+          <button id="repeatBtn" class="play-btn repeat-btn" aria-label="Повторить" disabled>
+            <span class="label">Повторить</span>
+          </button>
           <div class="toast-layer" id="toastLayer" aria-live="polite"></div>
-          <div class="feedback" id="feedback"></div>
         </div>
 
         <section class="answers" id="answers"></section>
@@ -58,25 +60,49 @@
             <label>Направление</label>
             <div class="segmented" id="directionSwitch">
               <button data-dir="up" class="active" title="Вверх">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" aria-hidden="true">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
                   <line x1="12" y1="19" x2="12" y2="5" />
                   <polyline points="5 12 12 5 19 12" />
                 </svg>
               </button>
               <button data-dir="down" title="Вниз">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" aria-hidden="true">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
                   <line x1="12" y1="5" x2="12" y2="19" />
                   <polyline points="19 12 12 19 5 12" />
                 </svg>
               </button>
               <button data-dir="mix" title="Микс">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" aria-hidden="true">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
                   <line x1="8" y1="19" x2="8" y2="5" />
                   <polyline points="4 9 8 5 12 9" />
                   <line x1="16" y1="5" x2="16" y2="19" />
