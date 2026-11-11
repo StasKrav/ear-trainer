@@ -3,7 +3,7 @@ import { AudioEngine } from '../audio.js';
 
 // Группы аккордов. «Трезвучия» — база, её нельзя выключить.
 export const CHORD_GROUPS = [
-  { id: 'triads',   name: 'Трезвучия',        members: ['maj', 'min'],   locked: true },
+  { id: 'triads',   name: 'Трезвучия',        members: ['maj', 'min'] },
   { id: 'sevenths', name: 'Септаккорды',      members: ['maj7', 'min7'] },
   { id: 'ninths',   name: 'Нонаккорды',       members: ['maj9', 'min9'] },
   { id: 'altered',  name: 'Уменьш./Увелич.',  members: ['dim', 'aug'] },
