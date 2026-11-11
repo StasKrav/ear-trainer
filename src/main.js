@@ -1,7 +1,11 @@
 import './style.css';
 import { AudioEngine } from './audio.js';
-import { EXERCISE_TYPES, INTERVAL_GROUPS } from './exercises/index.js';
-import { RANGES } from './constants.js';
+import {
+  EXERCISE_TYPES,
+  INTERVAL_GROUPS,
+  CHORD_GROUPS,
+} from './exercises/index.js';
+import { RANGES, CHORD_RANGES } from './constants.js';
 import * as AnswersUI from './ui/answers.js';
 import * as GroupsUI from './ui/groups.js';
 import * as PianoUI from './ui/piano.js';
@@ -13,62 +17,125 @@ import { createSession } from './session.js';
 PianoUI.initPiano(document.getElementById('piano'));
 ToastUI.initToast(document.getElementById('toastLayer'));
 ToastUI.initRoundLayer(document.getElementById('roundLayer'));
-
 AnswersUI.initAnswers(document.getElementById('answers'), (id, btn) => {
   session.answer(id, btn);
 });
 
-// ── Сессия ───────────────────────────────────────────────────
+// ── Состояние приложения ─────────────────────────────────────
 const state = {
+  type: 'intervals',           // 'intervals' | 'chords'
   mode: 'melodic',
   direction: 'up',
-  allowed: ['M3', 'm3'],
   difficulty: 'medium',
+  allowedIntervals: ['M3', 'm3'],
+  allowedChordGroups: ['triads'],
 };
 
+function currentRange() {
+  return state.type === 'chords'
+    ? CHORD_RANGES[state.difficulty]
+    : RANGES[state.difficulty];
+}
+
 function buildExercise() {
-  const Ex = EXERCISE_TYPES.interval;
-  return new Ex({
-    allowed: [...state.allowed],
+  const Ex = EXERCISE_TYPES[state.type];
+  const base = {
     mode: state.mode,
     direction: state.direction,
-    range: RANGES[state.difficulty],
-  });
+    range: currentRange(),
+  };
+  if (state.type === 'chords') {
+    return new Ex({ ...base, allowedGroups: [...state.allowedChordGroups] });
+  }
+  return new Ex({ ...base, allowed: [...state.allowedIntervals] });
 }
 
 const session = createSession({
   exercise: buildExercise(),
   mode: state.mode,
   direction: state.direction,
-  difficulty: state.difficulty,
 });
 
-// ── Группы интервалов ────────────────────────────────────────
-function toggleGroup(groupId) {
-  const g = INTERVAL_GROUPS.find((x) => x.id === groupId);
-  if (!g) return;
+// ── Чипы групп ───────────────────────────────────────────────
+const groupsLabel = document.getElementById('groupsLabel');
+const groupChipsEl = document.getElementById('groupChips');
 
-  const allActive = g.members.every((id) => state.allowed.includes(id));
-  if (allActive) {
-    const after = state.allowed.filter((id) => !g.members.includes(id));
-    if (after.length < 2) return;
-    state.allowed = after;
+function renderChips() {
+  if (state.type === 'chords') {
+    groupsLabel.textContent = 'Аккорды';
+    GroupsUI.renderGroupChips(CHORD_GROUPS, expandChordGroups());
   } else {
-    const added = g.members.filter((id) => !state.allowed.includes(id));
-    state.allowed = [...state.allowed, ...added];
+    groupsLabel.textContent = 'Интервалы';
+    GroupsUI.renderGroupChips(INTERVAL_GROUPS, state.allowedIntervals);
   }
-
-  GroupsUI.renderGroupChips(state.allowed);
-  AnswersUI.setAnswerOrder(state.allowed);
-  session.setAllowed(state.allowed);
 }
 
-GroupsUI.initGroups(document.getElementById('groupChips'), toggleGroup);
-GroupsUI.renderGroupChips(state.allowed);
-AnswersUI.setAnswerOrder(state.allowed);
+// Для аккордов activeIds — это все члены включённых групп,
+// чтобы chip.active подсвечивался, когда вся группа включена.
+function expandChordGroups() {
+  const ids = [];
+  CHORD_GROUPS.forEach((g) => {
+    if (state.allowedChordGroups.includes(g.id)) ids.push(...g.members);
+  });
+  return ids;
+}
+
+function toggleIntervalGroup(groupId) {
+  const g = INTERVAL_GROUPS.find((x) => x.id === groupId);
+  if (!g) return;
+  const allActive = g.members.every((id) => state.allowedIntervals.includes(id));
+  if (allActive) {
+    const after = state.allowedIntervals.filter((id) => !g.members.includes(id));
+    if (after.length < 2) return;
+    state.allowedIntervals = after;
+  } else {
+    const added = g.members.filter((id) => !state.allowedIntervals.includes(id));
+    state.allowedIntervals = [...state.allowedIntervals, ...added];
+  }
+  session.setAllowed(state.allowedIntervals);
+  AnswersUI.setAnswerOrder(session.getState().exercise.getAnswerOptions());
+  renderChips();
+}
+
+function toggleChordGroup(groupId) {
+  const g = CHORD_GROUPS.find((x) => x.id === groupId);
+  if (!g || g.locked) return;
+
+  const active = state.allowedChordGroups.includes(groupId);
+  if (active) {
+    // нельзя оставить без групп вообще
+    const after = state.allowedChordGroups.filter((id) => id !== groupId);
+    if (after.length === 0) return;
+    state.allowedChordGroups = after;
+  } else {
+    state.allowedChordGroups = [...state.allowedChordGroups, groupId];
+  }
+  session.setAllowedGroups(state.allowedChordGroups);
+  renderChips();
+}
+
+GroupsUI.initGroups(groupChipsEl, (groupId) => {
+  if (state.type === 'chords') toggleChordGroup(groupId);
+  else toggleIntervalGroup(groupId);
+});
+
+// ── Смена типа упражнения ───────────────────────────────────
+function switchType(type) {
+  state.type = type;
+
+  // Сброс ответов под новый тип
+  const ex = buildExercise();
+  session.setExercise(ex);
+  AnswersUI.setAnswerOrder(ex.getAnswerOptions());
+
+  // Интервалы: показываем группу «Интервалы» в чипах.
+  // Аккорды: та же группа чипов, но с аккордными группами.
+  renderChips();
+}
 
 // ── Настройки ────────────────────────────────────────────────
 initSettings({
+  onTypeChange: (type) => switchType(type),
   onModeChange: (mode) => {
     state.mode = mode;
     session.setMode(mode);
@@ -79,12 +146,13 @@ initSettings({
   },
   onDifficultyChange: (difficulty) => {
     state.difficulty = difficulty;
-    session.setDifficulty(difficulty);
+    session.setRange(currentRange());
   },
 });
 
-// ── Кнопка «Слушать» — старт подхода ─────────────────────────
+// ── Кнопки ───────────────────────────────────────────────────
 const playBtn = document.getElementById('playBtn');
+const repeatBtn = document.getElementById('repeatBtn');
 let audioLoading = false;
 
 playBtn.addEventListener('click', async () => {
@@ -95,7 +163,6 @@ playBtn.addEventListener('click', async () => {
     audioLoading = true;
     const originalText = playBtn.textContent;
     playBtn.textContent = 'Загрузка…';
-
     try {
       await AudioEngine.resume();
       await AudioEngine.load();
@@ -109,7 +176,6 @@ playBtn.addEventListener('click', async () => {
       audioLoading = false;
       return;
     }
-
     playBtn.textContent = originalText;
     audioLoading = false;
   }
@@ -117,14 +183,12 @@ playBtn.addEventListener('click', async () => {
   session.startRound();
 });
 
-const repeatBtn = document.getElementById('repeatBtn');
-
 repeatBtn.addEventListener('click', () => {
   if (repeatBtn.disabled) return;
   session.repeatCurrent();
 });
 
 // ── Старт ────────────────────────────────────────────────────
-// Первый подход запускается только по кнопке «Слушать».
-// createSession уже привёл UI в исходное состояние
-// (ответы недоступны, статистика обнулена).
+AnswersUI.setAnswerOrder(session.getState().exercise.getAnswerOptions());
+renderChips();
+AnswersUI.disableAnswers();

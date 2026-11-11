@@ -429,7 +429,7 @@ body.sidebar-closed {
 
 .answers {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
   gap: 6px;
 }
 
@@ -781,7 +781,21 @@ body.sidebar-closed .sidebar-handle {
   box-shadow: 0 4px 16px -6px var(--accent-glow);
 }
 
-/* Чекбокс */
+.chip.locked {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.chip.locked:hover {
+  transform: none;
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+.chip.locked.active:hover {
+  color: #fff;
+  border-color: transparent;
+}
 
 /* ── Тумблер ────────────────────────────────── */
 

@@ -1,5 +1,3 @@
-import { INTERVAL_GROUPS } from '../exercises/index.js';
-
 let el = null;
 let onToggle = null;
 
@@ -8,15 +6,22 @@ export function initGroups(container, toggleCallback) {
   onToggle = toggleCallback;
 }
 
-export function renderGroupChips(allowed) {
+// groups: [{ id, name, members, locked? }]
+// activeIds: string[]
+export function renderGroupChips(groups, activeIds) {
   el.innerHTML = '';
-  INTERVAL_GROUPS.forEach((g) => {
-    const allActive = g.members.every((id) => allowed.includes(id));
+  groups.forEach((g) => {
+    const allActive = g.members.every((id) => activeIds.includes(id));
     const chip = document.createElement('div');
-    chip.className = 'chip group' + (allActive ? ' active' : '');
+    chip.className =
+      'chip group' +
+      (allActive ? ' active' : '') +
+      (g.locked ? ' locked' : '');
     chip.textContent = g.name;
     chip.dataset.id = g.id;
-    chip.addEventListener('click', () => onToggle(g.id));
+    if (!g.locked) {
+      chip.addEventListener('click', () => onToggle(g.id));
+    }
     el.appendChild(chip);
   });
 }

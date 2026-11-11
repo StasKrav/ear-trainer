@@ -1,9 +1,15 @@
-import { IntervalExercise } from './intervals.js';
+import { IntervalExercise, INTERVALS, INTERVAL_GROUPS } from './intervals.js';
+import { ChordExercise, CHORD_TYPES, CHORD_GROUPS, CHORD_ANSWERS } from './chords.js';
 
 export const EXERCISE_TYPES = {
-  interval: IntervalExercise,
-  // chord: ChordExercise,   ← будущее
-  // scale: ScaleExercise,
+  intervals: IntervalExercise,
+  chords: ChordExercise,
 };
 
-export { INTERVALS, INTERVAL_GROUPS, INTERVAL_TO_GROUP } from './intervals.js';
+export {
+  INTERVALS,
+  INTERVAL_GROUPS,
+  CHORD_TYPES,
+  CHORD_GROUPS,
+  CHORD_ANSWERS,
+};

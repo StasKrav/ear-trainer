@@ -47,6 +47,14 @@
       </button>
 
       <div class="settings-body" id="settingsBody" hidden>
+        <div class="control-group">
+          <label>Упражнение</label>
+          <div class="segmented" id="typeSwitch">
+            <button data-type="intervals" class="active">Интервалы</button>
+            <button data-type="chords">Аккорды</button>
+          </div>
+        </div>
+
         <div class="controls-row">
           <div class="control-group">
             <label>Режим</label>
@@ -123,7 +131,7 @@
         </div>
 
         <div class="control-group">
-          <label>Интервалы</label>
+          <label id="groupsLabel">Интервалы</label>
           <div class="chips groups" id="groupChips"></div>
         </div>
 

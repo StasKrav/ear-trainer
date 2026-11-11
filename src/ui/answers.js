@@ -1,7 +1,5 @@
-import { INTERVALS } from '../exercises/index.js';
-
 let answersEl = null;
-let currentOrder = [];
+let currentOptions = [];
 
 export function initAnswers(el, onAnswer) {
   answersEl = el;
@@ -12,20 +10,19 @@ export function initAnswers(el, onAnswer) {
   });
 }
 
-export function setAnswerOrder(ids) {
-  currentOrder = INTERVALS.filter((iv) => ids.includes(iv.id)).sort(
-    (a, b) => a.semitones - b.semitones
-  );
+// options: [{ id, label }]
+export function setAnswerOrder(options) {
+  currentOptions = options;
   renderAnswers();
 }
 
 function renderAnswers() {
   answersEl.innerHTML = '';
-  currentOrder.forEach((iv) => {
+  currentOptions.forEach((opt) => {
     const btn = document.createElement('button');
     btn.className = 'answer-btn';
-    btn.textContent = iv.name;
-    btn.dataset.id = iv.id;
+    btn.textContent = opt.label;
+    btn.dataset.id = opt.id;
     answersEl.appendChild(btn);
   });
 }
@@ -49,8 +46,4 @@ export function markCorrect(id) {
 
 export function markWrong(id) {
   answersEl.querySelector(`[data-id="${id}"]`)?.classList.add('wrong');
-}
-
-export function getButton(id) {
-  return answersEl.querySelector(`[data-id="${id}"]`);
 }

@@ -25,13 +25,6 @@ export const INTERVAL_GROUPS = [
   { id: 'octaves',  name: 'Октавы',               members: ['P8'] },
 ];
 
-export const INTERVAL_TO_GROUP = {};
-INTERVAL_GROUPS.forEach((g) =>
-  g.members.forEach((id) => {
-    INTERVAL_TO_GROUP[id] = g.id;
-  })
-);
-
 export class IntervalExercise extends Exercise {
   constructor(opts) {
     super(opts);
@@ -91,5 +84,15 @@ export class IntervalExercise extends Exercise {
     } else {
       AudioEngine.playMelodic(ex.notes);
     }
+  }
+
+  getAnswerOptions() {
+    return this.pool()
+      .sort((a, b) => a.semitones - b.semitones)
+      .map((iv) => ({ id: iv.id, label: iv.name }));
+  }
+
+  getAnswerLabel(id) {
+    return INTERVALS.find((iv) => iv.id === id)?.name ?? id;
   }
 }
